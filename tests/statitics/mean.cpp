@@ -91,5 +91,43 @@ TEST_CASE("mean of sequential integers")
 
     REQUIRE(acc.count() == N);
 
-    REQUIRE_THAT(acc.mean(), Catch::Matchers::WithinULP(double(x0 + xN) / 2, 1));
+    REQUIRE_THAT(acc.mean(), Catch::Matchers::WithinULP(double(x0 + xN) / 2.0, 1));
+}
+
+TEST_CASE("mean of arithmetic progression")
+{
+    auto const x0 = double{-10};
+    auto const N = 100;
+    auto const d = double{0.45};
+    auto const xN = x0 + d * (N - 1);
+
+    grabin::mean_accumulator<double> acc;
+
+    for(auto x = x0; x <= xN; x += d)
+    {
+        acc(x);
+    }
+
+    REQUIRE(acc.count() == N);
+
+    REQUIRE_THAT(acc.mean(), Catch::Matchers::WithinAbs((x0 + xN) / 2, 1e-10));
+}
+
+TEST_CASE("mean of arithmetic progression - symmetric")
+{
+    auto const x0 = double{-10};
+    auto const xN = -x0;
+    auto const N = 101;
+    auto const d = (xN - x0) / (N-1);
+
+    grabin::mean_accumulator<double> acc;
+
+    for(auto x = x0; x <= xN; x += d)
+    {
+        acc(x);
+    }
+
+    REQUIRE(acc.count() == N);
+
+    REQUIRE_THAT(acc.mean(), Catch::Matchers::WithinAbs(0.0, 1e-10));
 }
