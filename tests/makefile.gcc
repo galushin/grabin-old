@@ -32,9 +32,9 @@ OBJDIR_RELEASE = ./obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./bin/Release/tests
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/statitics/mean.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/statitics/mean.o $(OBJDIR_DEBUG)/statitics/variance.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/statitics/mean.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/statitics/mean.o $(OBJDIR_RELEASE)/statitics/variance.o
 
 all: debug release
 
@@ -57,6 +57,9 @@ $(OBJDIR_DEBUG)/main.o: main.cpp
 
 $(OBJDIR_DEBUG)/statitics/mean.o: statitics/mean.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c statitics/mean.cpp -o $(OBJDIR_DEBUG)/statitics/mean.o
+
+$(OBJDIR_DEBUG)/statitics/variance.o: statitics/variance.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c statitics/variance.cpp -o $(OBJDIR_DEBUG)/statitics/variance.o
 
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
@@ -81,6 +84,9 @@ $(OBJDIR_RELEASE)/main.o: main.cpp
 
 $(OBJDIR_RELEASE)/statitics/mean.o: statitics/mean.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c statitics/mean.cpp -o $(OBJDIR_RELEASE)/statitics/mean.o
+
+$(OBJDIR_RELEASE)/statitics/variance.o: statitics/variance.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c statitics/variance.cpp -o $(OBJDIR_RELEASE)/statitics/variance.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)

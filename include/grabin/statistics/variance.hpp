@@ -13,66 +13,59 @@
    обеспечением. Если это не так, см. <https://www.gnu.org/licenses/>.
 */
 
-#ifndef Z_GRABIN_STATISTICS_MEAN_HPP_INCLUDED
-#define Z_GRABIN_STATISTICS_MEAN_HPP_INCLUDED
+#ifndef Z_GRABIN_STATISTICS_VARIANCE_HPP_INCLUDED
+#define Z_GRABIN_STATISTICS_VARIANCE_HPP_INCLUDED
 
 /** @file grabin/statistics/mean.hpp
- Вычисление выборочного среднего
+ Вычисление выборочной дисперсии
 */
 
-#include <type_traits>
+#include <grabin/statistics/mean.hpp>
+
+#include <cmath>
 
 namespace grabin
 {
 inline namespace v0
 {
-    /** @brief Класс-характеристика для определения типа среднего значения
+    /** @brief Накопитель для вычисления дисперсии
     @tparam T тип элементов выборки
     @tparam N тип для представления количества элементов
     */
-    template <class T, class N>
-    struct average_type
-    {
-        /// @brief Тип среднего значения элементов
-        using type = std::conditional_t<std::is_integral<T>::value, double, T>;
-    };
-
-    /** @brief Тип-синоним для типа среднего значения
-    @tparam T тип элементов
-    @tparam N тип для представления количества элементов
-    */
-    template <class T, class N>
-    using average_type_t = typename average_type<T, N>::type;
-
-    /** @brief Накопитель для вычисления выборочного среднего
-    @tparam T тип элементов
-    @tparam IntType тип для представления количества элементов
-    */
     template <class T, class IntType = int>
-    class mean_accumulator
+    class variance_accumulator
     {
+        using Mean_acc = mean_accumulator<T, IntType>;
+
     public:
         /// @brief Тип количества элементов
-        using counter_type = IntType;
+        using counter_type = typename Mean_acc::counter_type;
 
         /// @brief Тип среднего
-        using mean_type = average_type_t<T, IntType>;
+        using mean_type = typename Mean_acc::mean_type;
+
+        /// @brief Тип дисперсии
+        using variance_type = mean_type;
 
         /** @brief Конструктор
         @post <tt> this->count() == 0 </tt>
         @post <tt> this->mean() == T{0} </tt>
+        @post <tt> this->variance() == T{0} </tt>
+        @post <tt> this->standard_deviation() == T{0} </tt>
         */
-        mean_accumulator() = default;
+        variance_accumulator() = default;
 
         /** @brief Обновление статистик с учётом нового элемента
         @param x новый элемент
         @return <tt> *this </tt>
         */
-        mean_accumulator & operator()(T const & x)
+        variance_accumulator & operator()(T const & x)
         {
-            ++ this->n_;
+            auto const m_old = this->mean();
 
-            this->mean_ += (x - this->mean_) / this->n_;
+            this->mean_acc_(x);
+
+            this->S_ += (x - this->mean()) * (x - m_old);
 
             return *this;
         }
@@ -82,7 +75,7 @@ inline namespace v0
         */
         counter_type const & count() const
         {
-            return this->n_;
+            return this->mean_acc_.count();
         }
 
         /** @brief Среднее значение
@@ -90,16 +83,41 @@ inline namespace v0
         */
         mean_type const & mean() const
         {
-            return this->mean_;
+            return this->mean_acc_.mean();
+        }
+
+        /** @brief Дисперсия
+        @return Накопленное к настоящему моменту значение дисперсии
+        */
+        variance_type variance() const
+        {
+            if(this->count() == 0)
+            {
+                return this->S_;
+            }
+            else
+            {
+                return this->S_ / this->count();
+            }
+        }
+
+        /** @brief Среднеквадратическое отклонение
+        @return <tt> sqrt(this->variance()) </tt>
+        */
+        variance_type standard_deviation() const
+        {
+            using std::sqrt;
+            return sqrt(this->variance());
         }
 
     private:
-        counter_type n_ = counter_type{0};
-        mean_type mean_ = mean_type{0};
+        Mean_acc mean_acc_;
+        variance_type S_ = variance_type{0.0};
     };
 }
 // namespace v0
 }
 // namespace grabin
 
-#endif // Z_GRABIN_STATISTICS_MEAN_HPP_INCLUDED
+#endif
+// Z_GRABIN_STATISTICS_VARIANCE_HPP_INCLUDED
