@@ -4,7 +4,7 @@
 
 LD = $(CXX)
 
-INC = -I./contrib
+INC = -I./contrib -I../include
 RESINC = 
 LIBDIR = 
 LIB = 
@@ -32,9 +32,9 @@ OBJDIR_RELEASE = ./obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./bin/Release/tests
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/statitics/mean.o $(OBJDIR_DEBUG)/statitics/regression.o $(OBJDIR_DEBUG)/statitics/variance.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/statitics/mean.o $(OBJDIR_RELEASE)/statitics/regression.o $(OBJDIR_RELEASE)/statitics/variance.o
 
 all: debug release
 
@@ -43,6 +43,7 @@ clean: clean_debug clean_release
 before_debug: 
 	test -d ./bin/Debug || mkdir -p ./bin/Debug
 	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
+	test -d $(OBJDIR_DEBUG)/statitics || mkdir -p $(OBJDIR_DEBUG)/statitics
 
 after_debug: 
 
@@ -54,14 +55,25 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 $(OBJDIR_DEBUG)/main.o: main.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.cpp -o $(OBJDIR_DEBUG)/main.o
 
+$(OBJDIR_DEBUG)/statitics/mean.o: statitics/mean.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c statitics/mean.cpp -o $(OBJDIR_DEBUG)/statitics/mean.o
+
+$(OBJDIR_DEBUG)/statitics/regression.o: statitics/regression.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c statitics/regression.cpp -o $(OBJDIR_DEBUG)/statitics/regression.o
+
+$(OBJDIR_DEBUG)/statitics/variance.o: statitics/variance.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c statitics/variance.cpp -o $(OBJDIR_DEBUG)/statitics/variance.o
+
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf ./bin/Debug
 	rm -rf $(OBJDIR_DEBUG)
+	rm -rf $(OBJDIR_DEBUG)/statitics
 
 before_release: 
 	test -d ./bin/Release || mkdir -p ./bin/Release
 	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
+	test -d $(OBJDIR_RELEASE)/statitics || mkdir -p $(OBJDIR_RELEASE)/statitics
 
 after_release: 
 
@@ -73,10 +85,20 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 $(OBJDIR_RELEASE)/main.o: main.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.cpp -o $(OBJDIR_RELEASE)/main.o
 
+$(OBJDIR_RELEASE)/statitics/mean.o: statitics/mean.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c statitics/mean.cpp -o $(OBJDIR_RELEASE)/statitics/mean.o
+
+$(OBJDIR_RELEASE)/statitics/regression.o: statitics/regression.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c statitics/regression.cpp -o $(OBJDIR_RELEASE)/statitics/regression.o
+
+$(OBJDIR_RELEASE)/statitics/variance.o: statitics/variance.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c statitics/variance.cpp -o $(OBJDIR_RELEASE)/statitics/variance.o
+
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf ./bin/Release
 	rm -rf $(OBJDIR_RELEASE)
+	rm -rf $(OBJDIR_RELEASE)/statitics
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release
 
