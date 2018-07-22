@@ -23,7 +23,7 @@ TEST_CASE("linear regression for empty set and singular element")
 
     REQUIRE(acc.count() == 0);
     REQUIRE_THAT(acc.intercept(), Catch::Matchers::WithinULP(0.0, 1));
-    REQUIRE_THAT(acc.effects(), Catch::Matchers::WithinULP(0.0, 1));
+    REQUIRE_THAT(acc.effect(), Catch::Matchers::WithinULP(0.0, 1));
 
     auto const a = -2.3;
     auto const b = 3.14;
@@ -34,7 +34,7 @@ TEST_CASE("linear regression for empty set and singular element")
 
     REQUIRE(acc.count() == 1);
 
-    auto const a1 = acc.effects();
+    auto const a1 = acc.effect();
     auto const b1 = acc.intercept();
 
     REQUIRE_THAT(a1 * x0 + b1, Catch::Matchers::WithinAbs(y0, 1e-10));
@@ -56,7 +56,7 @@ TEST_CASE("linear regression for two points")
 
     REQUIRE(acc.count() == 2);
 
-    auto const a1 = acc.effects();
+    auto const a1 = acc.effect();
     auto const b1 = acc.intercept();
 
     CHECK_THAT(a1 * x0 + b1, Catch::Matchers::WithinAbs(y0, 1e-10));
@@ -87,7 +87,7 @@ TEST_CASE("linear regression for sample with no noise")
 
     REQUIRE(acc.count() == N);
 
-    auto const a1 = acc.effects();
+    auto const a1 = acc.effect();
     auto const b1 = acc.intercept();
 
     CHECK_THAT(a1, Catch::Matchers::WithinAbs(a, 1e-10));
@@ -121,7 +121,7 @@ TEST_CASE("linear regression for sample of identical elements")
 
     REQUIRE(acc.count() == N);
 
-    auto const a1 = acc.effects();
+    auto const a1 = acc.effect();
     auto const b1 = acc.intercept();
 
     CHECK_THAT(a1*x0 + b1, Catch::Matchers::WithinAbs(a*x0 + b, 1e-10));

@@ -17,7 +17,7 @@
 #define Z_GRABIN_STATISTICS_MEAN_HPP_INCLUDED
 
 /** @file grabin/statistics/mean.hpp
- Вычисление выборочного среднего
+ @brief Вычисление выборочного среднего
 */
 
 #include <type_traits>
@@ -27,7 +27,7 @@ namespace grabin
 inline namespace v0
 {
     /** @brief Класс-характеристика для определения типа среднего значения
-    @tparam T тип элементов выборки
+    @tparam T тип элементов
     @tparam N тип для представления количества элементов
     */
     template <class T, class N>

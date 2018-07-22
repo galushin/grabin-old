@@ -85,13 +85,13 @@ inline namespace v0
         */
         intercept_type intercept() const
         {
-            return this->y_stat_.mean() - this->effects() * this->x_stat_.mean();
+            return this->y_stat_.mean() - this->effect() * this->x_stat_.mean();
         }
 
-        /** @brief Коэффициенты
-        @return Накопленные к настоящему моменту значения коэффициентов
+        /** @brief Коэффициент
+        @return Накопленное к настоящему моменту значения коэффициента при переменной
         */
-        effect_type effects() const
+        effect_type effect() const
         {
             if(this->count() < 2)
             {

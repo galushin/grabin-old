@@ -17,7 +17,7 @@
 #define Z_GRABIN_STATISTICS_VARIANCE_HPP_INCLUDED
 
 /** @file grabin/statistics/mean.hpp
- Вычисление выборочной дисперсии
+ @brief Вычисление выборочной дисперсии
 */
 
 #include <grabin/statistics/mean.hpp>
@@ -29,7 +29,7 @@ namespace grabin
 inline namespace v0
 {
     /** @brief Накопитель для вычисления дисперсии
-    @tparam T тип элементов выборки
+    @tparam T тип элементов
     @tparam N тип для представления количества элементов
     */
     template <class T, class IntType = int>
