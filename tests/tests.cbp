@@ -35,9 +35,11 @@
 			<Add directory="../include" />
 		</Compiler>
 		<Unit filename="../include/grabin/statistics/mean.hpp" />
+		<Unit filename="../include/grabin/statistics/regression.hpp" />
 		<Unit filename="../include/grabin/statistics/variance.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="statitics/mean.cpp" />
+		<Unit filename="statitics/regression.cpp" />
 		<Unit filename="statitics/variance.cpp" />
 		<Extensions>
 			<code_completion />
