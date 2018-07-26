@@ -66,6 +66,9 @@ inline namespace v0
         /// @brief Тип размерности и индексов
         using dimension_type = typename Data::difference_type;
 
+        /// @brief Тип константного итератора
+        using const_iterator = typename Data::const_iterator;
+
         // Создание, копирование, уничтожение
         /** @brief Создаёт вектор с элементами из списка инициализации
         @param init список элементов
@@ -100,12 +103,57 @@ inline namespace v0
             return this->data_[index];
         }
 
-        T & operator[](dimension_type index);
+        T & operator[](dimension_type index)
+        {
+            // @todo Более идиоматичный код: as_const
+            return const_cast<T&>(static_cast<math_vector const&>(*this)[index]);
+        }
         //@}
+
+        // Итераторы
+        /** @brief Итератор начала последовательности элементов
+        @return Итератор, задающий начало последовательности элементов
+        */
+        const_iterator begin() const
+        {
+            return this->data_.begin();
+        }
+
+        /** @brief Итератор конца последовательности элементов
+        @return Итератор, задающий конец последовательности элементов
+        */
+        const_iterator end() const
+        {
+            return this->data_.end();
+        }
 
     private:
         Data data_;
     };
+
+    /** @brief Оператор "равно"
+    @param x, y аргументы
+    @return @c true, если равны размерности векторов и все их соответствующие элементы, иначе
+    --- @b false.
+    @todo Предупреждение, если проверка элементов на равенство может быть не точной, как, например,
+    для чисел с плавающей точкой.
+    */
+    template <class T, class Check>
+    bool operator==(math_vector<T, Check> const & x, math_vector<T, Check> const & y)
+    {
+        return std::equal(x.begin(), x.end(), y.begin(), y.end());
+    }
+
+    /** @brief Оператор "не равно"
+    @todo Обобщённый оператор !=
+    @param x, y аргументы
+    @return <tt> !(x == y) </tt>
+    */
+    template <class T, class Check>
+    bool operator!=(math_vector<T, Check> const & x, math_vector<T, Check> const & y)
+    {
+        return !(x == y);
+    }
 }
 // namespace v0
 }

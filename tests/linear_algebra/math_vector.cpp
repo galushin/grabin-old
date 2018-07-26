@@ -42,9 +42,53 @@ TEST_CASE("math_vector throws if index is out of range")
     CHECK_THROWS_AS(x[x.dim() + 5], std::logic_error);
 }
 
-// @todo Модифицирующий доступ к элементам по индексу
-// @todo Реакция на выход индекса за границы диапазона
-// @todo Операторы == и !=
+TEST_CASE("math_vector mutable index access")
+{
+    grabin::math_vector<int> x{1, 2, 3, 4};
+    auto const x_old = x;
+    auto const a = - 13;
+
+    REQUIRE(x[0] != a);
+
+    x[0] = a;
+
+    CHECK(a == x[0]);
+
+    CHECK_THROWS_AS(x[-1], std::logic_error);
+    CHECK_THROWS_AS(x[x.dim()], std::logic_error);
+    CHECK_THROWS_AS(x[x.dim() + 5], std::logic_error);
+}
+
+TEST_CASE("math_vector equal operator : same size")
+{
+    grabin::math_vector<int> x{1, 2, 3, 4};
+    auto const x_old = x;
+
+    CHECK(x_old == x);
+    CHECK(!(x_old != x));
+
+    auto const a = - 13;
+
+    REQUIRE(x[0] != a);
+
+    x[0] = a;
+
+    CHECK(x != x_old);
+    CHECK(!(x == x_old));
+}
+
+TEST_CASE("math_vector equal operator : different size")
+{
+    grabin::math_vector<int> const x{1, 2, 3, 4};
+    grabin::math_vector<int> const y{1, 2, 3};
+
+    REQUIRE(x.dim() != y.dim());
+
+    CHECK(x != y);
+    CHECK(y != x);
+    CHECK(!(x == y));
+}
+
 // @todo Линейные операции: умножение на скаляр и сложение векторов
-// @todo Конструктор без аргументов
+// @todo Конструктор без аргументов?
 // @todo Вычисление среднего
