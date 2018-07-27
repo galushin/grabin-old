@@ -89,6 +89,104 @@ TEST_CASE("math_vector equal operator : different size")
     CHECK(!(x == y));
 }
 
-// @todo Линейные операции: умножение на скаляр и сложение векторов
-// @todo Конструктор без аргументов?
+TEST_CASE("math_vector : multiply assign")
+{
+    grabin::math_vector<int> x{1, 2, 3, 4};
+    auto const x_old = x;
+
+    auto const a = -3;
+
+    grabin::math_vector<int> & r = (x *= a);
+
+    static_assert(std::is_same<decltype(x *= a), decltype((x))>::value,
+                  "multiplies assign must return *this");
+    REQUIRE(&r == &x);
+
+    REQUIRE(x.dim() == x_old.dim());
+
+    for(auto i = 0*x.dim(); i < x.dim(); ++ i)
+    {
+        CHECK(x[i] == x_old[i] * a);
+    }
+
+}
+
+TEST_CASE("math_vector : multiply")
+{
+    grabin::math_vector<int> const x_old{1, 2, 3, 4};
+    auto const a = -3;
+
+    auto const x1 = x_old * a;
+    auto const x2 = a * x_old;
+
+    REQUIRE(x1.dim() == x_old.dim());
+    REQUIRE(x2.dim() == x_old.dim());
+
+    for(auto i = 0*x1.dim(); i < x1.dim(); ++ i)
+    {
+        CHECK(x1[i] == x_old[i] * a);
+    }
+
+    CHECK(x1 == x2);
+}
+
+TEST_CASE("math_vector: plus_assign")
+{
+    grabin::math_vector<int> x{1, 2, 3, 4};
+    auto const x_old = x;
+    grabin::math_vector<int> const y{1, -2, 2, 3};
+
+    REQUIRE(x.dim() == y.dim());
+
+    grabin::math_vector<int> & r = (x += y);
+
+    static_assert(std::is_same<decltype(x += y), decltype((x))>::value,
+                  "plus assign must return *this");
+    REQUIRE(&r == &x);
+
+    REQUIRE(x.dim() == x_old.dim());
+
+    for(auto i = 0*x.dim(); i < x.dim(); ++ i)
+    {
+        CHECK(x[i] == x_old[i] + y[i]);
+    }
+}
+
+TEST_CASE("math_vector: plus")
+{
+    grabin::math_vector<int> const x{1, 2, 3, 4};
+    grabin::math_vector<int> const y{1, -2, 2, 3};
+
+    REQUIRE(x.dim() == y.dim());
+
+    auto const z = x + y;
+
+    REQUIRE(z.dim() == x.dim());
+
+    for(auto i = 0*x.dim(); i < x.dim(); ++ i)
+    {
+        CHECK(z[i] == x[i] + y[i]);
+    }
+}
+
+TEST_CASE("math_vector: plus assign throws on different dimenstions")
+{
+    grabin::math_vector<int> x{1, 2, 3, 4};
+    grabin::math_vector<int> const y{1, 2, 3};
+
+    REQUIRE(x.dim() != y.dim());
+
+    REQUIRE_THROWS_AS(x += y, std::logic_error);
+}
+
+TEST_CASE("math_vector: plus throws on different dimenstions")
+{
+    grabin::math_vector<int> const x{1, 2, 3, 4};
+    grabin::math_vector<int> const y{1, 2, 3};
+
+    REQUIRE(x.dim() != y.dim());
+
+    REQUIRE_THROWS_AS(x + y, std::logic_error);
+}
+
 // @todo Вычисление среднего

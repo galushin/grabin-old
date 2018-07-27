@@ -45,6 +45,20 @@ inline namespace v0
                 throw std::logic_error("incorrect index");
             }
         }
+
+        /** @brief Проверка индекса
+        @param x, y вектора
+        @throw logic_error, если <tt> x.dim() != y.dim() </tt>
+        */
+        template <class Vector>
+        static void check_equal_dimensions(Vector const & x, Vector const & y)
+        {
+            if(x.dim() != y.dim())
+            {
+                // @todo Более информативное сообщение
+                throw std::logic_error("incompatible dimensions");
+            }
+        }
     };
 
     // @todo Стратегия проверок через assert
@@ -65,6 +79,9 @@ inline namespace v0
 
         /// @brief Тип размерности и индексов
         using dimension_type = typename Data::difference_type;
+
+        /// @brief Тип итератора
+        using iterator = typename Data::iterator;
 
         /// @brief Тип константного итератора
         using const_iterator = typename Data::const_iterator;
@@ -110,22 +127,70 @@ inline namespace v0
         }
         //@}
 
+        // Операторы составного присваивания
+        /** @brief Умножение на скаляр
+        @param a числовой множитель
+        @return <tt> *this </tt>
+        @post Умножает каждый элемент <tt> *this </tt> на @c a
+        */
+        math_vector & operator*=(T const & a)
+        {
+            for(auto & x : *this)
+            {
+                x *= a;
+            }
+
+            return *this;
+        }
+
+        /** @brief Прибавление вектора
+        @param Прибавляемый вектор
+        @pre <tt> this->dim() == x.dim() </tt>
+        @post Прибавляет к каждому элементу <tt> *this </tt> соответсвующий элемент @c x
+        @return *this
+        */
+        math_vector & operator+=(math_vector const & x)
+        {
+            checking_policy::check_equal_dimensions(*this, x);
+
+            for(auto i = 0*x.dim(); i != x.dim(); ++ i)
+            {
+                (*this)[i] += x[i];
+            }
+
+            return *this;
+        }
+
         // Итераторы
+        //@{
         /** @brief Итератор начала последовательности элементов
         @return Итератор, задающий начало последовательности элементов
         */
-        const_iterator begin() const
+        iterator begin()
         {
             return this->data_.begin();
         }
 
+        const_iterator begin() const
+        {
+            return this->data_.begin();
+        }
+        //@}
+
+        //@{
         /** @brief Итератор конца последовательности элементов
         @return Итератор, задающий конец последовательности элементов
         */
+        iterator end()
+        {
+            return this->data_.end();
+        }
+
         const_iterator end() const
         {
             return this->data_.end();
         }
+        //@}
 
     private:
         Data data_;
@@ -135,8 +200,6 @@ inline namespace v0
     @param x, y аргументы
     @return @c true, если равны размерности векторов и все их соответствующие элементы, иначе
     --- @b false.
-    @todo Предупреждение, если проверка элементов на равенство может быть не точной, как, например,
-    для чисел с плавающей точкой.
     */
     template <class T, class Check>
     bool operator==(math_vector<T, Check> const & x, math_vector<T, Check> const & y)
@@ -145,7 +208,6 @@ inline namespace v0
     }
 
     /** @brief Оператор "не равно"
-    @todo Обобщённый оператор !=
     @param x, y аргументы
     @return <tt> !(x == y) </tt>
     */
@@ -153,6 +215,53 @@ inline namespace v0
     bool operator!=(math_vector<T, Check> const & x, math_vector<T, Check> const & y)
     {
         return !(x == y);
+    }
+
+    /** @brief Оператор умножения вектора на скаляр
+    @param x вектор
+    @param a скаляр
+    @return Вектор, элементы которого имеют вид <tt> x[i] * a </tt>, где
+    <tt> 0 <= i && i < x.dim() </tt>
+    */
+    template <class T1, class Check, class T2>
+    auto operator*(math_vector<T1, Check> x, T2 const & a)
+    -> math_vector<decltype(x[0] * a), Check>
+    {
+        x *= a;
+        return x;
+    }
+
+    /** @brief Оператор умножения вектора на скаляр
+    @param x вектор
+    @param a скаляр
+    @return Вектор, элементы которого имеют вид <tt> a * x[i] </tt>, где
+    <tt> 0 <= i && i < x.dim() </tt>
+    */
+    template <class T1, class Check, class T2>
+    auto operator*(T2 const & a, math_vector<T1, Check> x)
+    -> math_vector<decltype(a*x[0]), Check>
+    {
+        for(auto & elem : x)
+        {
+            elem = a * elem;
+        }
+
+        return x;
+    }
+
+    /** @brief Оператор сложения векторов
+    @param x, y аргументы
+    @pre <tt> x.dim() == y.dim() </tt>
+    @return Вектор, элементы которого равны сумме соответствующих элементов векторов @c x и @c y
+    @todo Разные типы шаблонных параметров? Может ли быть разным Check?
+    @todo Различные сочетания случаев, когда один из аргументов является временным объектом
+    */
+    template <class T, class Check>
+    math_vector<T, Check>
+    operator+(math_vector<T, Check> x, math_vector<T, Check> const & y)
+    {
+        x += y;
+        return x;
     }
 }
 // namespace v0
