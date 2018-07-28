@@ -189,4 +189,75 @@ TEST_CASE("math_vector: plus throws on different dimenstions")
     REQUIRE_THROWS_AS(x + y, std::logic_error);
 }
 
-// @todo Вычисление среднего
+TEST_CASE("math_vector : null vector")
+{
+    auto const n = 3;
+    grabin::math_vector<int> const z(n);
+
+    REQUIRE(z.dim() == n);
+
+    for(auto i = 0*n; i < n; ++ i)
+    {
+        CHECK(z[i] == 0);
+    }
+}
+
+TEST_CASE("math_vector : null vector + floation point")
+{
+    auto const n = 5;
+    grabin::math_vector<double> const z(n);
+
+    REQUIRE(z.dim() == n);
+
+    for(auto i = 0*n; i < n; ++ i)
+    {
+        REQUIRE_THAT(z[i], Catch::Matchers::WithinULP(0.0, 1));
+    }
+}
+
+#include <grabin/statistics/mean.hpp>
+
+TEST_CASE("math_vector : mean accumulation")
+{
+    using Vector = grabin::math_vector<double>;
+
+    Vector const x1{-0.5, 1.3};
+    Vector const x2{2.3, -3.14};
+
+    REQUIRE(x1.dim() == x2.dim());
+    auto const n = x1.dim();
+
+    // Пустая выборка
+    auto acc = grabin::mean_accumulator<Vector>(Vector(n));
+
+    auto const m0 = acc.mean();
+    REQUIRE(m0.dim() == n);
+
+    for(auto i = 0*n; i < n; ++ i)
+    {
+        CHECK_THAT(m0[i], Catch::Matchers::WithinAbs(0.0, 1e-10));
+    }
+
+    // Выборка из одного элемента
+    acc(x1);
+    auto const m1 = acc.mean();
+
+    REQUIRE(m1.dim() == n);
+
+    for(auto i = 0*n; i < n; ++ i)
+    {
+        CHECK_THAT(m1[i], Catch::Matchers::WithinAbs(x1[i], 1e-10));
+    }
+
+    // Выборка из двух элементов
+    acc(x2);
+
+    auto const m2 = acc.mean();
+
+    REQUIRE(m2.dim() == n);
+
+    for(auto i = 0*n; i < n; ++ i)
+    {
+        CHECK_THAT(m2[i], Catch::Matchers::WithinAbs((x1[i] + x2[i])/2, 1e-10));
+    }
+}

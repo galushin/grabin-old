@@ -21,6 +21,7 @@
 */
 
 #include <type_traits>
+#include <utility>
 
 namespace grabin
 {
@@ -64,6 +65,16 @@ inline namespace v0
         */
         mean_accumulator() = default;
 
+        /** @brief Конструктор с явным заданием "нулевого" элемента
+        @param zero "нулевой" элемент
+        @post <tt> this->count() == 0 </tt>
+        @post <tt> this->mean() == zero </tt>
+        */
+        mean_accumulator(T zero)
+         : n_(0)
+         , mean_(std::move(zero))
+        {}
+
         /** @brief Обновление статистик с учётом нового элемента
         @param x новый элемент
         @return <tt> *this </tt>
@@ -94,12 +105,13 @@ inline namespace v0
         }
 
     private:
-        counter_type n_ = counter_type{0};
-        mean_type mean_ = mean_type{0};
+        counter_type n_ = counter_type(0);
+        mean_type mean_ = mean_type(0);
     };
 }
 // namespace v0
 }
 // namespace grabin
 
-#endif // Z_GRABIN_STATISTICS_MEAN_HPP_INCLUDED
+#endif
+// Z_GRABIN_STATISTICS_MEAN_HPP_INCLUDED

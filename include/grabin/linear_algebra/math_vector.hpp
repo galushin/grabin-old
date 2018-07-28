@@ -41,7 +41,6 @@ inline namespace v0
         {
             if(index < 0 || index >= x.dim())
             {
-                // @todo Более информативное сообщение
                 throw std::logic_error("incorrect index");
             }
         }
@@ -55,18 +54,27 @@ inline namespace v0
         {
             if(x.dim() != y.dim())
             {
-                // @todo Более информативное сообщение
                 throw std::logic_error("incompatible dimensions");
+            }
+        }
+
+        /** @brief Проверка того, что делитель не равен нулю
+        @param x делитель
+        @throw logic_error, если <tt> x != T{0} </tt>
+        */
+        template <class Scalar>
+        static void check_divisor_is_not_zero(Scalar const & x)
+        {
+            if(x == Scalar{0})
+            {
+                throw std::logic_error("Division by zero");
             }
         }
     };
 
-    // @todo Стратегия проверок через assert
-
     /** @brief Класс "математического вектора
     @tparam T тип элементов
     @tparam Checking стратегия проверок и обработки ошибок
-    @todo Определить требования к типам-параметрам
     */
     template <class T, class Checking = vector_policy_throws>
     class math_vector
@@ -87,6 +95,19 @@ inline namespace v0
         using const_iterator = typename Data::const_iterator;
 
         // Создание, копирование, уничтожение
+        /// @brief Конструктор без параметров запрещён
+        math_vector() = delete;
+
+        /** @brief Создаёт нулевой вектор заданной размерности
+        @param n размерность
+        @post <tt> this->dim() == n </tt>
+        @post Для любого @c i из интервала <tt> [0; this->dim()) </tt> выполняется
+        <tt> (*this)[i] == T(0) </tt>
+        */
+        explicit math_vector(dimension_type n)
+         : data_(n, T(0))
+        {}
+
         /** @brief Создаёт вектор с элементами из списка инициализации
         @param init список элементов
         @post <tt> this->dim() == init.size() </tt>
@@ -122,7 +143,6 @@ inline namespace v0
 
         T & operator[](dimension_type index)
         {
-            // @todo Более идиоматичный код: as_const
             return const_cast<T&>(static_cast<math_vector const&>(*this)[index]);
         }
         //@}
@@ -143,6 +163,23 @@ inline namespace v0
             return *this;
         }
 
+        /** @brief Деление на скаляр
+        @param a числовой множитель
+        @return <tt> *this </tt>
+        @post Делит каждый элемент <tt> *this </tt> на @c a
+        */
+        math_vector & operator/=(T const & a)
+        {
+            checking_policy::check_divisor_is_not_zero(a);
+
+            for(auto & x : *this)
+            {
+                x /= a;
+            }
+
+            return *this;
+        }
+
         /** @brief Прибавление вектора
         @param Прибавляемый вектор
         @pre <tt> this->dim() == x.dim() </tt>
@@ -156,6 +193,24 @@ inline namespace v0
             for(auto i = 0*x.dim(); i != x.dim(); ++ i)
             {
                 (*this)[i] += x[i];
+            }
+
+            return *this;
+        }
+
+        /** @brief Вычитание вектора
+        @param Вычитаемый вектор
+        @pre <tt> this->dim() == x.dim() </tt>
+        @post Вычитает из каждого элемента <tt> *this </tt> соответсвующий элемент @c x
+        @return *this
+        */
+        math_vector & operator-=(math_vector const & x)
+        {
+            checking_policy::check_equal_dimensions(*this, x);
+
+            for(auto i = 0*x.dim(); i != x.dim(); ++ i)
+            {
+                (*this)[i] -= x[i];
             }
 
             return *this;
@@ -223,9 +278,9 @@ inline namespace v0
     @return Вектор, элементы которого имеют вид <tt> x[i] * a </tt>, где
     <tt> 0 <= i && i < x.dim() </tt>
     */
-    template <class T1, class Check, class T2>
-    auto operator*(math_vector<T1, Check> x, T2 const & a)
-    -> math_vector<decltype(x[0] * a), Check>
+    template <class T, class Check>
+    math_vector<T, Check>
+    operator*(math_vector<T, Check> x, T const & a)
     {
         x *= a;
         return x;
@@ -237,9 +292,9 @@ inline namespace v0
     @return Вектор, элементы которого имеют вид <tt> a * x[i] </tt>, где
     <tt> 0 <= i && i < x.dim() </tt>
     */
-    template <class T1, class Check, class T2>
-    auto operator*(T2 const & a, math_vector<T1, Check> x)
-    -> math_vector<decltype(a*x[0]), Check>
+    template <class T, class Check>
+    math_vector<T, Check>
+    operator*(T const & a, math_vector<T, Check> x)
     {
         for(auto & elem : x)
         {
@@ -253,14 +308,40 @@ inline namespace v0
     @param x, y аргументы
     @pre <tt> x.dim() == y.dim() </tt>
     @return Вектор, элементы которого равны сумме соответствующих элементов векторов @c x и @c y
-    @todo Разные типы шаблонных параметров? Может ли быть разным Check?
-    @todo Различные сочетания случаев, когда один из аргументов является временным объектом
     */
     template <class T, class Check>
     math_vector<T, Check>
     operator+(math_vector<T, Check> x, math_vector<T, Check> const & y)
     {
         x += y;
+        return x;
+    }
+
+    /** @brief Оператор деления вектора на скалря
+    @param x вектор
+    @param a скаляр
+    @post <tt> a != 0 </tt>
+    @return Вектор, элементы которого равны соответствующим элементам @c x, делённым на @c a
+    */
+    template <class T1, class Check, class T2>
+    auto operator/(math_vector<T1, Check> x, T2 const & a)
+    -> math_vector<decltype(x[0] / a), Check>
+    {
+        auto result = math_vector<decltype(x[0] / a), Check>(std::move(x));
+        result /= a;
+        return result;
+    }
+
+    /** @brief Оператор разности векторов
+    @param x, y аргументы
+    @pre <tt> x.dim() == y.dim() </tt>
+    @return Вектор, элементы которого равны разности соответствующих элементов векторов @c x и @c y
+    */
+    template <class T, class Check>
+    math_vector<T, Check>
+    operator-(math_vector<T, Check> x, math_vector<T, Check> const & y)
+    {
+        x -= y;
         return x;
     }
 }
