@@ -20,6 +20,7 @@
  @brief Векторы и связанные с ними функции
 */
 
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -41,7 +42,9 @@ inline namespace v0
         {
             if(index < 0 || index >= x.dim())
             {
-                throw std::logic_error("incorrect index");
+                std::ostringstream os;
+                os << "Incorrect index = " << index << ", dimension = " << x.dim();
+                throw std::logic_error(os.str());
             }
         }
 
@@ -82,6 +85,9 @@ inline namespace v0
         using Data = std::vector<T>;
     public:
         // Типы
+        /// @brief Тип элементов
+        using value_type = T;
+
         /// @brief Стратегия проверки и обработки ошибок
         using checking_policy = Checking;
 
