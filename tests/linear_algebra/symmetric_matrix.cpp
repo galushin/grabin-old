@@ -31,6 +31,11 @@ TEST_CASE("symmetric_matrix : zero matrix")
     {
         REQUIRE(zero(i, j) == 0);
     }
+
+    for(auto const & x : zero)
+    {
+        REQUIRE(x == 0);
+    }
 }
 
 TEST_CASE("math_vector : outer_square")
@@ -83,5 +88,105 @@ TEST_CASE("symmetric_matrix : plus")
     for(auto j = 0*n; j < n; ++ j)
     {
         CHECK(C(i, j) == (x1[i]*x1[j] + x2[i]*x2[j]));
+    }
+}
+
+TEST_CASE("math_vector : multiply assign by scalar")
+{
+    grabin::math_vector<int> const x{2, -3, 4};
+    auto const alpha = 3;
+
+    auto C = grabin::outer_square(x);
+    auto & r = (C *= alpha);
+
+    REQUIRE(&r == &C);
+
+    static_assert(std::is_same<decltype(C *= alpha), decltype((C))>::value,
+                  "multiplies assign must return *this");
+
+    REQUIRE(C.dim() == x.dim());
+    auto const n = C.dim();
+
+    for(auto i = 0*n; i < n; ++ i)
+    for(auto j = 0*n; j < n; ++ j)
+    {
+        CHECK(C(i, j) == alpha*x[i]*x[j]);
+    }
+}
+
+TEST_CASE("math_vector : left multiply by scalar")
+{
+    grabin::math_vector<int> const x{2, -3, 4};
+    auto const alpha = 3;
+
+    auto const C = grabin::outer_square(x);
+    auto const D = C * alpha;
+
+    REQUIRE(D.dim() == x.dim());
+    auto const n = D.dim();
+
+    for(auto i = 0*n; i < n; ++ i)
+    for(auto j = 0*n; j < n; ++ j)
+    {
+        CHECK(D(i, j) == alpha*C(i, j));
+    }
+}
+
+TEST_CASE("math_vector : right multiply by scalar")
+{
+    grabin::math_vector<int> const x{2, -3, 4};
+    auto const alpha = 3;
+
+    auto const C = grabin::outer_square(x);
+    auto const D = alpha * C;
+
+    REQUIRE(D.dim() == x.dim());
+    auto const n = D.dim();
+
+    for(auto i = 0*n; i < n; ++ i)
+    for(auto j = 0*n; j < n; ++ j)
+    {
+        CHECK(D(i, j) == alpha*C(i, j));
+    }
+}
+
+TEST_CASE("math_vector : divide assign by scalar")
+{
+    grabin::math_vector<int> const x{2, -3, 4};
+    auto const alpha = 3;
+
+    auto C = grabin::outer_square(x);
+    auto & r = (C /= alpha);
+
+    REQUIRE(&r == &C);
+
+    static_assert(std::is_same<decltype(C /= alpha), decltype((C))>::value,
+                  "multiplies assign must return *this");
+
+    REQUIRE(C.dim() == x.dim());
+    auto const n = C.dim();
+
+    for(auto i = 0*n; i < n; ++ i)
+    for(auto j = 0*n; j < n; ++ j)
+    {
+        CHECK(C(i, j) == x[i]*x[j]/alpha);
+    }
+}
+
+TEST_CASE("math_vector : divide by scalar")
+{
+    grabin::math_vector<int> const x{2, -3, 4};
+    auto const alpha = 3;
+
+    auto const C = grabin::outer_square(x);
+    auto const D = C / alpha;
+
+    REQUIRE(D.dim() == x.dim());
+    auto const n = D.dim();
+
+    for(auto i = 0*n; i < n; ++ i)
+    for(auto j = 0*n; j < n; ++ j)
+    {
+        CHECK(D(i, j) == C(i, j)/alpha);
     }
 }

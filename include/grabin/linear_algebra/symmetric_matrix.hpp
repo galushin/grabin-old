@@ -42,6 +42,12 @@ inline namespace v0
         /// @brief Тип для представления размерности
         using dimension_type = typename Data::dimension_type;
 
+        /// @brief Тип итератора
+        using iterator = typename Data::iterator;
+
+        /// @brief Тип константного итератора
+        using const_iterator = typename Data::const_iterator;
+
         // Создание, копирование, уничтожение
         /** @brief Конструктор, создающий нулевую матрицу
         @param n размерность
@@ -91,7 +97,7 @@ inline namespace v0
         @param x прибавляемая матрица
         @pre <tt> this->dim() == x.dim() </tt>
         @post Прибавляет к каждому элементу <tt> *this </tt> соответсвующий элемент @c x
-        @return <tt> *this </tt.
+        @return <tt> *this </tt>
         */
         symmetric_matrix & operator+=(symmetric_matrix const & x)
         {
@@ -101,6 +107,61 @@ inline namespace v0
 
             return *this;
         }
+
+        /** @brief Умножение матрицы на скаляр
+        @param alpha скаляр, на который умножается матрица
+        @post Уможает каждый элемент <tt> *this </tt> на @c alpha
+        @return <tt> *this </tt>
+        */
+        symmetric_matrix & operator*=(T const & alpha)
+        {
+            this->data_ *= alpha;
+
+            return *this;
+        }
+
+        /** @brief Деление матрицы на скаляр
+        @param alpha скаляр, на который делится матрица
+        @post Делит каждый элемент <tt> *this </tt> на @c alpha
+        @return <tt> *this </tt>
+        */
+        symmetric_matrix & operator/=(T const & alpha)
+        {
+            this->data_ /= alpha;
+
+            return *this;
+        }
+
+        // Итераторы
+        //@{
+        /** @brief Итератор начала последовательности элементов
+        @return Итератор, задающий начало последовательности элементов
+        */
+        iterator begin()
+        {
+            return this->data_.begin();
+        }
+
+        const_iterator begin() const
+        {
+            return this->data_.begin();
+        }
+        //@}
+
+        //@{
+        /** @brief Итератор конца последовательности элементов
+        @return Итератор, задающий конец последовательности элементов
+        */
+        iterator end()
+        {
+            return this->data_.end();
+        }
+
+        const_iterator end() const
+        {
+            return this->data_.end();
+        }
+        //@}
 
     private:
         dimension_type dim_;
@@ -118,6 +179,52 @@ inline namespace v0
     {
         x += y;
         return x;
+    }
+
+    /** @brief Умножение матрицы на скаляр справа
+    @param x матрица
+    @param alpha скаляр
+    @return Матрица, элементы которой равны соответствующим элементам @c x, умноженным на @c alpha
+    */
+    template <class T1, class Check, class T2>
+    auto operator*(symmetric_matrix<T1, Check> x, T2 const & alpha)
+    -> symmetric_matrix<decltype(x(0, 0)*alpha), Check>
+    {
+        symmetric_matrix<decltype(x(0, 0)*alpha), Check> result(std::move(x));
+        result *= alpha;
+        return result;
+    }
+
+    /** @brief Умножение матрицы на скаляр слева
+    @param x матрица
+    @param alpha скаляр
+    @return Матрица, элементы которой равны @c alpha, умноженному соответствующим элементам @c x
+    */
+    template <class T1, class T2, class Check>
+    auto operator*(T1 const & alpha, symmetric_matrix<T2, Check> x)
+    -> symmetric_matrix<decltype(alpha*x(0, 0)), Check>
+    {
+        for(auto & elem : x)
+        {
+            elem = alpha * elem;
+        }
+
+        return x;
+    }
+
+    /** @brief Оператор деления матрицы на скалря
+    @param x матрицы
+    @param alpha скаляр
+    @post <tt> alpha != 0 </tt>
+    @return Матрица, элементы которого равны соответствующим элементам @c x, делённым на @c a
+    */
+    template <class T1, class Check, class T2>
+    auto operator/(symmetric_matrix<T1, Check> x, T2 const & alpha)
+    -> symmetric_matrix<decltype(x(0,0) / alpha), Check>
+    {
+        auto result = symmetric_matrix<decltype(x(0,0)/alpha), Check>(std::move(x));
+        result /= alpha;
+        return result;
     }
 }
 // namespace v0
