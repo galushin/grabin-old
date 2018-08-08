@@ -38,7 +38,7 @@ TEST_CASE("symmetric_matrix : zero matrix")
     }
 }
 
-TEST_CASE("math_vector : outer_square")
+TEST_CASE("symmetric_matrix : outer_square")
 {
     grabin::math_vector<int> const x{2, -3, 4};
 
@@ -91,7 +91,7 @@ TEST_CASE("symmetric_matrix : plus")
     }
 }
 
-TEST_CASE("math_vector : multiply assign by scalar")
+TEST_CASE("symmetric_matrix : multiply assign by scalar")
 {
     grabin::math_vector<int> const x{2, -3, 4};
     auto const alpha = 3;
@@ -114,7 +114,7 @@ TEST_CASE("math_vector : multiply assign by scalar")
     }
 }
 
-TEST_CASE("math_vector : left multiply by scalar")
+TEST_CASE("symmetric_matrix : left multiply by scalar")
 {
     grabin::math_vector<int> const x{2, -3, 4};
     auto const alpha = 3;
@@ -132,7 +132,7 @@ TEST_CASE("math_vector : left multiply by scalar")
     }
 }
 
-TEST_CASE("math_vector : right multiply by scalar")
+TEST_CASE("symmetric_matrix : right multiply by scalar")
 {
     grabin::math_vector<int> const x{2, -3, 4};
     auto const alpha = 3;
@@ -150,7 +150,7 @@ TEST_CASE("math_vector : right multiply by scalar")
     }
 }
 
-TEST_CASE("math_vector : divide assign by scalar")
+TEST_CASE("symmetric_matrix : divide assign by scalar")
 {
     grabin::math_vector<int> const x{2, -3, 4};
     auto const alpha = 3;
@@ -173,7 +173,7 @@ TEST_CASE("math_vector : divide assign by scalar")
     }
 }
 
-TEST_CASE("math_vector : divide by scalar")
+TEST_CASE("symmetric_matrix : divide by scalar")
 {
     grabin::math_vector<int> const x{2, -3, 4};
     auto const alpha = 3;

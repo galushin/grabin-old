@@ -261,3 +261,74 @@ TEST_CASE("math_vector : mean accumulation")
         CHECK_THAT(m2[i], Catch::Matchers::WithinAbs((x1[i] + x2[i])/2, 1e-10));
     }
 }
+
+#include <grabin/statistics/variance.hpp>
+
+TEST_CASE("math_vector : variance accumulation")
+{
+    using Vector = grabin::math_vector<double>;
+
+    Vector const x1{-0.5, 1.3};
+    auto const x2 = -1.0 * x1;
+
+    REQUIRE(x1.dim() == x2.dim());
+    auto const n = x1.dim();
+
+    // Пустая выборка
+    auto acc = grabin::variance_accumulator<Vector>(Vector(n));
+
+    auto const m0 = acc.mean();
+    REQUIRE(m0.dim() == n);
+
+    for(auto i = 0*n; i < n; ++ i)
+    {
+        CHECK_THAT(m0[i], Catch::Matchers::WithinAbs(0.0, 1e-10));
+    }
+
+    auto const S0 = acc.variance();
+
+    for(auto i = 0*n; i < n; ++ i)
+    for(auto j = 0*n; j < n; ++ j)
+    {
+        CHECK_THAT(S0(i,j), Catch::Matchers::WithinAbs(0.0, 1e-10));
+    }
+
+    // Выборка из одного элемента
+    acc(x1);
+    auto const m1 = acc.mean();
+
+    REQUIRE(m1.dim() == n);
+
+    for(auto i = 0*n; i < n; ++ i)
+    {
+        CHECK_THAT(m1[i], Catch::Matchers::WithinAbs(x1[i], 1e-10));
+    }
+
+    auto const S1 = acc.variance();
+
+    for(auto i = 0*n; i < n; ++ i)
+    for(auto j = 0*n; j < n; ++ j)
+    {
+        CHECK_THAT(S1(i,j), Catch::Matchers::WithinAbs(0.0, 1e-10));
+    }
+
+    // Выборка из двух элементов
+    acc(x2);
+
+    auto const m2 = acc.mean();
+
+    REQUIRE(m2.dim() == n);
+
+    for(auto i = 0*n; i < n; ++ i)
+    {
+        CHECK_THAT(m2[i], Catch::Matchers::WithinAbs((x1[i] + x2[i])/2, 1e-10));
+    }
+
+    auto const S2 = acc.variance();
+
+    for(auto i = 0*n; i < n; ++ i)
+    for(auto j = 0*n; j < n; ++ j)
+    {
+        CHECK_THAT(S2(i,j), Catch::Matchers::WithinAbs(x1[i]*x1[j], 1e-10));
+    }
+}

@@ -46,6 +46,39 @@ inline namespace v0
 
         return result;
     }
+
+    /** @brief Внешний "квадрат" (внешнее произведения вектора самого на себя) для арифметических
+    типов (то есть для целочисленных типов и типов с плавающей точкой)
+    @param x число
+    @return x*x;
+    */
+    template <class T>
+    std::enable_if_t<std::is_arithmetic<T>::value, T>
+    outer_square(T const & x)
+    {
+        return x*x;
+    }
+
+    /** @brief Стандартная тензорная алгебра
+    @tparam T тип элементов векторного пространства
+    */
+    template <class T>
+    struct default_tensor_algebra
+    {
+    public:
+        /** @brief Тензорный "квадрат" -- тензорное произведение на самого себя
+        @param x вектор
+        @return <tt> outer_square(x) </tt>, где outer_square может быть найдена с помощью ADL
+        */
+        static auto outer_square_impl(T const & x)
+        {
+            using ::grabin::outer_square;
+            return outer_square(x);
+        }
+
+        /// @brief Тип тензорного произведения
+        using tensor_product_type = decltype(default_tensor_algebra::outer_square_impl(std::declval<T>()));
+    };
 }
 // namespace v0
 }

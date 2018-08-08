@@ -61,7 +61,7 @@ inline namespace v0
 
         /** @brief Конструктор
         @post <tt> this->count() == 0 </tt>
-        @post <tt> this->mean() == T{0} </tt>
+        @post <tt> this->mean() == T(0) </tt>
         */
         mean_accumulator() = default;
 
