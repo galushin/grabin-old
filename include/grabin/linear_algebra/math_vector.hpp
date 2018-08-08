@@ -20,6 +20,7 @@
  @brief Векторы и связанные с ними функции
 */
 
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -41,7 +42,9 @@ inline namespace v0
         {
             if(index < 0 || index >= x.dim())
             {
-                throw std::logic_error("incorrect index");
+                std::ostringstream os;
+                os << "Incorrect index = " << index << ", dimension = " << x.dim();
+                throw std::logic_error(os.str());
             }
         }
 
@@ -82,6 +85,9 @@ inline namespace v0
         using Data = std::vector<T>;
     public:
         // Типы
+        /// @brief Тип элементов
+        using value_type = T;
+
         /// @brief Стратегия проверки и обработки ошибок
         using checking_policy = Checking;
 
@@ -278,12 +284,13 @@ inline namespace v0
     @return Вектор, элементы которого имеют вид <tt> x[i] * a </tt>, где
     <tt> 0 <= i && i < x.dim() </tt>
     */
-    template <class T, class Check>
-    math_vector<T, Check>
-    operator*(math_vector<T, Check> x, T const & a)
+    template <class T1, class Check, class T2>
+    auto operator*(math_vector<T1, Check> x, T2 const & a)
+    -> math_vector<decltype(x[0]*a)>
     {
-        x *= a;
-        return x;
+        auto result = math_vector<decltype(x[0]*a), Check>(std::move(x));
+        result *= a;
+        return result;
     }
 
     /** @brief Оператор умножения вектора на скаляр

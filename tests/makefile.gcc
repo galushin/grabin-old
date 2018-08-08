@@ -32,9 +32,9 @@ OBJDIR_RELEASE = ./obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./bin/Release/tests
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/linear_algebra/math_vector.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/statitics/mean.o $(OBJDIR_DEBUG)/statitics/regression.o $(OBJDIR_DEBUG)/statitics/variance.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/linear_algebra/math_vector.o $(OBJDIR_DEBUG)/linear_algebra/symmetric_matrix.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/statitics/mean.o $(OBJDIR_DEBUG)/statitics/regression.o $(OBJDIR_DEBUG)/statitics/variance.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/linear_algebra/math_vector.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/statitics/mean.o $(OBJDIR_RELEASE)/statitics/regression.o $(OBJDIR_RELEASE)/statitics/variance.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/linear_algebra/math_vector.o $(OBJDIR_RELEASE)/linear_algebra/symmetric_matrix.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/statitics/mean.o $(OBJDIR_RELEASE)/statitics/regression.o $(OBJDIR_RELEASE)/statitics/variance.o
 
 all: debug release
 
@@ -55,6 +55,9 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 
 $(OBJDIR_DEBUG)/linear_algebra/math_vector.o: linear_algebra/math_vector.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c linear_algebra/math_vector.cpp -o $(OBJDIR_DEBUG)/linear_algebra/math_vector.o
+
+$(OBJDIR_DEBUG)/linear_algebra/symmetric_matrix.o: linear_algebra/symmetric_matrix.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c linear_algebra/symmetric_matrix.cpp -o $(OBJDIR_DEBUG)/linear_algebra/symmetric_matrix.o
 
 $(OBJDIR_DEBUG)/main.o: main.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.cpp -o $(OBJDIR_DEBUG)/main.o
@@ -90,6 +93,9 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 
 $(OBJDIR_RELEASE)/linear_algebra/math_vector.o: linear_algebra/math_vector.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c linear_algebra/math_vector.cpp -o $(OBJDIR_RELEASE)/linear_algebra/math_vector.o
+
+$(OBJDIR_RELEASE)/linear_algebra/symmetric_matrix.o: linear_algebra/symmetric_matrix.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c linear_algebra/symmetric_matrix.cpp -o $(OBJDIR_RELEASE)/linear_algebra/symmetric_matrix.o
 
 $(OBJDIR_RELEASE)/main.o: main.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.cpp -o $(OBJDIR_RELEASE)/main.o
